@@ -1,24 +1,35 @@
-N, M, Q = map(int, input().split())
-A = list(map(int, input().split()))
-B = list(map(int, input().split()))
+def list_to_dict(data: list) -> dict:
+    return {key: data.count(key) for key in set(data)}
 
-info_A = dict()
-info_B = dict()
+
+def merge_dicts(dict1: dict, dict2: dict) -> dict:
+    result = dict(dict1)
+    for key, value in dict2.items():
+        if key in result:
+            result[key] -= value
+        else:
+            result[key] = -value
+    return result
+
+
+N, M, Q = map(int, input().split())
+A = list_to_dict(input().split())
+B = list_to_dict(input().split())
+
+all_values = merge_dicts(A, B)
 
 for _ in range(Q):
     typ, player, card = input().split()
-    card = int(card)
-    player_name = (A, B)[player == 'B']
-    info = (info_A, info_B)[player == 'B']
-    if typ == '1':
-        if card in player_name:
-            info[card] = info.get(card, 0) + 1
-        else:
-            player_name.append(card)
-    else:
-        if card in info and info[card] > 0:
-            info[card] = info.get(card) - 1
-        else:
-            player_name.remove(card)
 
-    print(len(set(A).symmetric_difference(set(B))) + sum(info_A.values()) + sum(info_B.values()), end=' ')
+    if player == 'A':
+        if typ == '1':
+            all_values[card] = all_values.get(card, 0) + 1
+        else:
+            all_values[card] = all_values.get(card, 0) - 1
+    else:
+        if typ == '1':
+            all_values[card] = all_values.get(card, 0) - 1
+        else:
+            all_values[card] = all_values.get(card, 0) + 1
+
+    print(sum(map(lambda x: abs(all_values[x]), all_values)), end=' ')
